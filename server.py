@@ -44,8 +44,10 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-mongo_url = os.getenv("MONGO_URL")
-db_name = os.getenv("DB_NAME")
+mongo_url = os.getenv(mongodb+srv://ombatinyakerumago61_db_user:YOUR_REAL_PASSWORD@cluster0.540qxu2.mongodb.net/?appName=Cluster0
+)
+db_name = os.getenv(ombatinyakerumago61_db
+)
 
 if not mongo_url or not db_name:
     raise RuntimeError("MongoDB env vars missing")
