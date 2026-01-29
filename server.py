@@ -44,9 +44,20 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+import os
+from motor.motor_asyncio import AsyncIOMotorClient
+
+mongo_url = os.getenv("MONGO_URL")
+db_name = os.getenv("DB_NAME")
+
+if not mongo_url:
+    raise RuntimeError("❌ MONGO_URL is not set in Railway Variables")
+
+if not db_name:
+    raise RuntimeError("❌ DB_NAME is not set in Railway Variables")
+
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[db_name]
 
 # JWT Configuration
 JWT_SECRET = os.environ.get('JWT_SECRET', 'bfcms-secret-key-change-in-production')
