@@ -44,20 +44,20 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
 
-MONGODB_URI = os.getenv("MONGODB_URI")
+from pymongo.mongo_client import MongoClient
 
-client = AsyncIOMotorClient(
-    MONGODB_URI,
-    authSource="admin",
-    tls=True,
-    tlsAllowInvalidCertificates=True
-)
+uri = "mongodb+srv://ombatinyakerumago61_db_user:Kenya2026@cluster0.540qxu2.mongodb.net/bfcms"
 
-db = client.get_database("bfcms")
+# Create a new client and connect to the server
+client = MongoClient(uri)
 
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
 # JWT Configuration
 JWT_SECRET = os.environ.get('JWT_SECRET', 'bfcms-secret-key-change-in-production')
 JWT_ALGORITHM = "HS256"
