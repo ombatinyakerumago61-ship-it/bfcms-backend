@@ -47,7 +47,7 @@ load_dotenv(ROOT_DIR / '.env')
 
 from pymongo.mongo_client import MongoClient
 
-uri = "mongodb+srv://ombatinyakerumago61_db_user:Kenya2026@cluster0.540qxu2.mongodb.net/bfcms"
+uri = "mongodb+srv://ombatinyakerumago61_db_user:PaZMXXOzbfb8vUiZ@cluster0.540qxu2.mongodb.net/bfcms"
 
 # Create a new client and connect to the server
 client = MongoClient(uri)
