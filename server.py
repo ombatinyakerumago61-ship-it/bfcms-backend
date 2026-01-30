@@ -44,7 +44,7 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-ffrom motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient
 
 client = AsyncIOMotorClient(MONGO_URI)
 db = client.mydb
