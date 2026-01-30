@@ -58,6 +58,17 @@ try:
     print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
     print(e)
+
+from motor.motor_asyncio import AsyncIOMotorClient
+
+MONGO_URI = "mongodb+srv://ombatinyakerumago61_db_user:PaZMXXOzbfb8vUiZ@cluster0.540qxu2.mongodb.net/?retryWrites=true&w=bfcms_db"
+
+# Create a MongoDB client
+client = AsyncIOMotorClient(MONGO_URI)
+
+# Select the database you want to use
+db = client['bfcms_db']  # <-- Replace with your actual DB name
+
 # JWT Configuration
 JWT_SECRET = os.environ.get('JWT_SECRET', 'bfcms-secret-key-change-in-production')
 JWT_ALGORITHM = "HS256"
