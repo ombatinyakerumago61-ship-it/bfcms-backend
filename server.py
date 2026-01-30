@@ -369,14 +369,6 @@ class WarningResponse(BaseModel):
     letter_generated: bool
     email_sent: bool
     created_at: str
-import cors from "cors";
-// or const cors = require("cors");
-
-app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true
-}));
-
 # Password utilities
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
