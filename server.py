@@ -47,13 +47,17 @@ load_dotenv(ROOT_DIR / '.env')
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 
-MONGO_URI = os.getenv("MONGO_URI")
+MONGODB_URI = os.getenv("MONGODB_URI")
 
-if not MONGO_URI:
-    raise Exception("MONGO_URI is not set in Railway")
+client = AsyncIOMotorClient(
+    MONGODB_URI,
+    authSource="admin",
+    tls=True,
+    tlsAllowInvalidCertificates=True
+)
 
-client = AsyncIOMotorClient(MONGO_URI)
-db = client["bfcms"]
+db = client.get_database("bfcms")
+
 # JWT Configuration
 JWT_SECRET = os.environ.get('JWT_SECRET', 'bfcms-secret-key-change-in-production')
 JWT_ALGORITHM = "HS256"
