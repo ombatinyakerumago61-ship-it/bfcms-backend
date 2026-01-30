@@ -1697,13 +1697,13 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "http://localhost:5173",
-        "https://bfcms-backend-production.up.railway.app"
+        "https://bfcms-frontend-production.up.railway.app",  # if you deploy frontend
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Logging
 logging.basicConfig(
