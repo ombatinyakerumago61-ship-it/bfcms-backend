@@ -44,17 +44,19 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-import os
 from motor.motor_asyncio import AsyncIOMotorClient
+import os
 
-mongo_url = os.getenv("MONGO_URL")
-db_name = os.getenv("DB_NAME")
+MONGODB_URI = os.getenv("MONGODB_URI")
 
-if not mongo_url or not db_name:
-    raise RuntimeError("MongoDB env vars missing")
+client = AsyncIOMotorClient(
+    MONGODB_URI,
+    authSource="admin",
+    tls=True,
+    tlsAllowInvalidCertificates=True
+)
 
-client = AsyncIOMotorClient(mongo_url)
-db = client[db_name]
+db = client.get_database("bfcms")
 # JWT Configuration
 JWT_SECRET = os.environ.get('JWT_SECRET', 'bfcms-secret-key-change-in-production')
 JWT_ALGORITHM = "HS256"
