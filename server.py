@@ -486,7 +486,7 @@ async def get_me(user: dict = Depends(get_current_user)):
 @api_router.post("/members", response_model=MemberResponse)
 async def create_member(
     member: MemberCreate,
-    user: dict = Depends(get_current_user)
+    user: dict = Depends(require_roles([UserRole.SUPER_ADMIN, UserRole.SECRETARY, UserRole.CHAIRPERSON]))
 ):
     membership_number = await generate_membership_number()
     date_joined = member.date_joined or datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -513,7 +513,7 @@ async def get_members(
     department: Optional[str] = None,
     status: Optional[str] = None,
     search: Optional[str] = None,
-    user: dict = Depends(get_current_user)
+    user: dict = Depends(require_roles([UserRole.SUPER_ADMIN, UserRole.SECRETARY, UserRole.CHAIRPERSON]))
 ):
     query = {}
     if department:
