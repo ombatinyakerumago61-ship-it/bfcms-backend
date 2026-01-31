@@ -1700,20 +1700,21 @@ async def send_warning_email(warning_id: str, user: dict = Depends(get_current_u
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
 
-# Include router
-app.include_router(api_router)
+from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "https://bfcms-frontend-production.up.railway.app",  # if you deploy frontend
+        "https://bfcms-frontend-production.up.railway.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Include router AFTER middleware
+app.include_router(api_router)
 
 # Logging
 logging.basicConfig(
