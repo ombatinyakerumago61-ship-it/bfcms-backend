@@ -503,11 +503,16 @@ async def get_me(user: dict = Depends(get_current_user)):
 @api_router.post("/members", response_model=MemberResponse)
 async def create_member(
     member: MemberCreate,
-    user: dict = Depends(require_roles([UserRole.SUPER_ADMIN, UserRole.SECRETARY, UserRole.CHAIRPERSON]))
+    user: dict = Depends(
+        require_roles([
+            UserRole.SUPER_ADMIN,
+            UserRole.SECRETARY,
+            UserRole.CHAIRPERSON
+        ])
+    )
 ):
     membership_number = await generate_membership_number()
-    date_joined = member.date_joined or datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    
+
     member_doc = {
         "id": str(uuid.uuid4()),
         "membership_number": membership_number,
@@ -516,60 +521,97 @@ async def create_member(
         "phone": member.phone,
         "email": member.email,
         "department": member.department.value,
-        "date_joined": date_joined,
+        "date_joined": (
+            member.date_joined
+            if member.date_joined
+            else datetime.now(timezone.utc).isoformat()
+        ),
         "status": MemberStatus.ACTIVE.value,
         "photo": member.photo,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "created_by": user["id"]
     }
+
     await db.members.insert_one(member_doc)
     return MemberResponse(**member_doc)
+
 
 @api_router.get("/members", response_model=List[MemberResponse])
 async def get_members(
     department: Optional[str] = None,
     status: Optional[str] = None,
     search: Optional[str] = None,
-    user: dict = Depends(require_roles([UserRole.SUPER_ADMIN, UserRole.SECRETARY, UserRole.CHAIRPERSON]))
+    user: dict = Depends(
+        require_roles([
+            UserRole.SUPER_ADMIN,
+            UserRole.SECRETARY,
+            UserRole.CHAIRPERSON
+        ])
+    )
 ):
     query = {}
+
     if department:
         query["department"] = department
+
     if status:
         query["status"] = status
+
     if search:
         query["$or"] = [
             {"full_name": {"$regex": search, "$options": "i"}},
             {"membership_number": {"$regex": search, "$options": "i"}},
-            {"email": {"$regex": search, "$options": "i"}}
+            {"email": {"$regex": search, "$options": "i"}},
         ]
-    
+
     members = await db.members.find(query, {"_id": 0}).to_list(1000)
     return [MemberResponse(**m) for m in members]
 
+
 @api_router.get("/members/{member_id}", response_model=MemberResponse)
-async def get_member(member_id: str, user: dict = Depends(get_current_user)):
+async def get_member(
+    member_id: str,
+    user: dict = Depends(get_current_user)
+):
     member = await db.members.find_one({"id": member_id}, {"_id": 0})
+
     if not member:
         raise HTTPException(status_code=404, detail="Member not found")
+
     return MemberResponse(**member)
+
 
 @api_router.put("/members/{member_id}", response_model=MemberResponse)
 async def update_member(
     member_id: str,
     update: MemberUpdate,
-    user: dict = Depends(require_roles([UserRole.SUPER_ADMIN, UserRole.SECRETARY, UserRole.CHAIRPERSON]))
+    user: dict = Depends(
+        require_roles([
+            UserRole.SUPER_ADMIN,
+            UserRole.SECRETARY,
+            UserRole.CHAIRPERSON
+        ])
+    )
 ):
-    update_data = {k: v.value if isinstance(v, Enum) else v for k, v in update.model_dump(exclude_unset=True).items()}
+    update_data = {
+        k: (v.value if isinstance(v, Enum) else v)
+        for k, v in update.model_dump(exclude_unset=True).items()
+    }
+
     if not update_data:
         raise HTTPException(status_code=400, detail="No update data provided")
-    
-    result = await db.members.update_one({"id": member_id}, {"$set": update_data})
+
+    result = await db.members.update_one(
+        {"id": member_id},
+        {"$set": update_data}
+    )
+
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Member not found")
-    
+
     member = await db.members.find_one({"id": member_id}, {"_id": 0})
     return MemberResponse(**member)
+
 
 @api_router.delete("/members/{member_id}")
 async def delete_member(
@@ -577,28 +619,41 @@ async def delete_member(
     user: dict = Depends(require_roles([UserRole.SUPER_ADMIN]))
 ):
     result = await db.members.delete_one({"id": member_id})
+
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Member not found")
+
     return {"message": "Member deleted successfully"}
+
 
 # QR CODE GENERATION
 def generate_qr_code(data: str) -> bytes:
-    """Generate QR code image as bytes"""
-    qr = qrcode.QRCode(version=1, box_size=10, border=2)
+    qr = qrcode.QRCode(version=1, box_size=8, border=2)
     qr.add_data(data)
     qr.make(fit=True)
-    img = qr.make_image(fill_color="#1E3A5F", back_color="white")
+
+    img = qr.make_image(fill_color="black", back_color="white")
     buffer = BytesIO()
-    img.save(buffer, format='PNG')
+    img.save(buffer, format="PNG")
     buffer.seek(0)
     return buffer.getvalue()
 
+
 @api_router.get("/members/{member_id}/qrcode")
-async def get_member_qrcode(member_id: str, user: dict = Depends(get_current_user)):
-    """Generate QR code for a member"""
+async def get_member_qrcode(
+    member_id: str,
+    user: dict = Depends(get_current_user)
+):
     member = await db.members.find_one({"id": member_id}, {"_id": 0})
+
     if not member:
         raise HTTPException(status_code=404, detail="Member not found")
+
+    qr_data = f"BFCMS|{member['membership_number']}|{member['full_name']}"
+    qr_bytes = generate_qr_code(qr_data)
+
+    return Response(content=qr_bytes, media_type="image/png")
+
     
     # QR code contains member verification data
     qr_data = f"BFCMS|{member['membership_number']}|{member['full_name']}|{member['department']}"
