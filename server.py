@@ -494,9 +494,8 @@ async def get_me(user: dict = Depends(get_current_user)):
 
 # MEMBERS ENDPOINTS
 @api_router.post("/members", response_model=MemberResponse)
-async def create_member(
-    member: MemberCreate,
-    user: dict = Depends(get_current_user)):
+@api_router.post("/members")
+async def create_member(member: MemberCreate):
     membership_number = await generate_membership_number()
     date_joined = member.date_joined or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     
