@@ -718,7 +718,8 @@ async def get_member_id_card(member_id: str, user: dict = Depends(get_current_us
         media_type="application/pdf",
         headers={"Content-Disposition": f"attachment; filename=idcard_{member['membership_number']}.pdf"}
     )
-
+# 4️⃣ 🔴 INCLUDE ROUTER — MUST BE AT THE END
+app.include_router(api_router)
 # DISCIPLINARY ENDPOINTS
 @api_router.post("/disciplinary", response_model=DisciplinaryResponse)
 async def create_disciplinary_case(
