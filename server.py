@@ -380,20 +380,6 @@ class WarningResponse(BaseModel):
     letter_generated: bool
     email_sent: bool
     created_at: str
-    
-    app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://bfcms-frontend-production.up.railway.app",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Include router AFTER middleware
-app.include_router(api_router)
 # Password utilities
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -444,7 +430,20 @@ async def generate_inventory_code(category: str) -> str:
     prefix = category[:3].upper()
     count = await db.inventory.count_documents({"category": category})
     return f"{prefix}-{str(count + 1).zfill(4)}"
+ 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://bfcms-frontend-production.up.railway.app",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# Include router AFTER middleware
+app.include_router(api_router)
 # AUTH ENDPOINTS
 @api_router.post("/auth/register", response_model=dict)
 async def register(user: UserCreate):
