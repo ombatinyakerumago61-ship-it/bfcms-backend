@@ -17,6 +17,12 @@ from enum import Enum
 import base64
 import asyncio
 from io import BytesIO
+import cors from "cors";
+
+app.use(cors({
+  origin: ["http://localhost:3000"],
+  credentials: true
+}));
 
 # PDF Generation
 from reportlab.lib.pagesizes import A4, landscape
