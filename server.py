@@ -1,35 +1,40 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import Response
-from starlette.middleware.cors import CORSMiddleware
-
 from dotenv import load_dotenv
+from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-
-from pydantic import BaseModel, Field, EmailStr
-from typing import List, Optional
-from enum import Enum
-from datetime import datetime, timezone, timedelta
-from io import BytesIO
-
 import os
-import uuid
 import logging
+from pathlib import Path
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import List, Optional
+import uuid
+from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
+from enum import Enum
+import base64
+import asyncio
+from io import BytesIO
+
+# PDF Generation
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.units import inch, mm
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
+from reportlab.pdfgen import canvas
+from reportlab.graphics.shapes import Drawing, Rect, String
 import urllib.request
 
-# QR Code
+# QR Code Generation
 import qrcode
 from PIL import Image as PILImage
 
-# PDF Generation
-from reportlab.lib.units import inch
-from reportlab.lib import colors
-from reportlab.pdfgen import canvas
-from reportlab.platypus import Image
-
-# Optional Email Provider
+# Email (optional - if configured)
 try:
     import resend
     RESEND_AVAILABLE = True
