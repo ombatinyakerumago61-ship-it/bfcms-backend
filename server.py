@@ -1,44 +1,56 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Form
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import Response
-from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+
+from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
-import os
-import logging
-from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict, EmailStr
+
+from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
-import uuid
-from datetime import datetime, timezone, timedelta
-import bcrypt
-import jwt
 from enum import Enum
-import base64
-import asyncio
+from datetime import datetime, timezone, timedelta
 from io import BytesIO
 
-# PDF Generation
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.units import inch, mm
-from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
-from reportlab.pdfgen import canvas
-from reportlab.graphics.shapes import Drawing, Rect, String
+import os
+import uuid
+import logging
+import bcrypt
+import jwt
 import urllib.request
 
-# QR Code Generation
+# QR Code
 import qrcode
 from PIL import Image as PILImage
 
-# Email (optional - if configured)
+# PDF Generation
+from reportlab.lib.units import inch
+from reportlab.lib import colors
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Image
+
+# Optional Email Provider
 try:
     import resend
     RESEND_AVAILABLE = True
 except ImportError:
     RESEND_AVAILABLE = False
+# Load environment variables
+load_dotenv()
+
+# App
+app = FastAPI(title="BFCMS API", version="1.0.0")
+
+# Router
+api_router = APIRouter(prefix="/api")
+
+# Security
+security = HTTPBearer()
+
+# Logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
