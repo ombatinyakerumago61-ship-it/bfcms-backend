@@ -493,7 +493,6 @@ async def get_me(user: dict = Depends(get_current_user)):
     return UserResponse(**user)
 
 # MEMBERS ENDPOINTS
-@api_router.post("/members", response_model=MemberResponse)
 @api_router.post("/members")
 async def create_member(member: MemberCreate):
     membership_number = await generate_membership_number()
