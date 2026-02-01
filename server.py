@@ -85,13 +85,20 @@ CHOIR_LOGO_URL = 'https://customer-assets.emergentagent.com/job_choir-manager/ar
 ## Create the main app
 app = FastAPI(title="BFCMS API", version="1.0.0")
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://bfcms-frontend-production.up.railway.app",  # if you deploy frontend
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
