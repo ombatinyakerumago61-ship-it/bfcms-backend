@@ -431,20 +431,6 @@ async def generate_inventory_code(category: str) -> str:
     count = await db.inventory.count_documents({"category": category})
     return f"{prefix}-{str(count + 1).zfill(4)}"
 
-from fastapi.middleware.cors import CORSMiddleware 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://bfcms-frontend-production.up.railway.app",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Include router AFTER middleware
-app.include_router(api_router)
 # AUTH ENDPOINTS
 @api_router.post("/auth/register", response_model=dict)
 async def register(user: UserCreate):
@@ -1712,7 +1698,20 @@ async def send_warning_email(warning_id: str, user: dict = Depends(get_current_u
         return {"message": "Email sent successfully", "email_id": email.get("id")}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
+from fastapi.middleware.cors import CORSMiddleware 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://bfcms-frontend-production.up.railway.app",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# Include router AFTER middleware
+app.include_router(api_router)
 # Logging
 logging.basicConfig(
     level=logging.INFO,
