@@ -35,22 +35,6 @@ try:
     RESEND_AVAILABLE = True
 except ImportError:
     RESEND_AVAILABLE = False
-# Load environment variables
-load_dotenv()
-
-# App
-app = FastAPI(title="BFCMS API", version="1.0.0")
-
-# Router
-api_router = APIRouter(prefix="/api")
-
-# Security
-security = HTTPBearer()
-
-# Logger
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -95,7 +79,21 @@ if RESEND_AVAILABLE and RESEND_API_KEY:
 CHOIR_LOGO_URL = 'https://customer-assets.emergentagent.com/job_choir-manager/artifacts/opi10nbe_logo.png'
 
 ## Create the main app
+# Load environment variables
+load_dotenv()
+
+# App
 app = FastAPI(title="BFCMS API", version="1.0.0")
+
+# Router
+api_router = APIRouter(prefix="/api")
+
+# Security
+security = HTTPBearer()
+
+# Logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 from fastapi.middleware.cors import CORSMiddleware
 
