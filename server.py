@@ -82,10 +82,20 @@ if RESEND_AVAILABLE and RESEND_API_KEY:
 # Choir Logo URL
 CHOIR_LOGO_URL = 'https://customer-assets.emergentagent.com/job_choir-manager/artifacts/opi10nbe_logo.png'
 
-# Create the main app
+## Create the main app
 app = FastAPI(title="BFCMS API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
+
 
 # Health check endpoint for Kubernetes deployment
 @app.get("/health")
