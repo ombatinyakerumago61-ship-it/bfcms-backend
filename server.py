@@ -17,7 +17,7 @@ from enum import Enum
 import base64
 import asyncio
 from io import BytesIO
-from fastapi.middleware.cors import CORSMiddleware
+
 # PDF Generation
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.units import inch, mm
@@ -430,7 +430,8 @@ async def generate_inventory_code(category: str) -> str:
     prefix = category[:3].upper()
     count = await db.inventory.count_documents({"category": category})
     return f"{prefix}-{str(count + 1).zfill(4)}"
- 
+
+from fastapi.middleware.cors import CORSMiddleware 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
