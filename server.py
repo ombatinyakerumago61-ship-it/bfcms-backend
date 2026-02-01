@@ -62,7 +62,7 @@ except Exception as e:
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
-MONGO_URI = "mongodb+srv://ombatinyakerumago61_db_user:PaZMXXOzbfb8vUiZ@cluster0.540qxu2.mongodb.net/?retryWrites=true&w=bfcms_db"
+MONGO_URI = "mongodb+srv://ombatinyakerumago61_db_user:PaZMXXOzbfb8vUiZ@cluster0.540qxu2.mongodb.net/bfcms_db?retryWrites=true&w=majority"
 # Create a MongoDB client
 client = AsyncIOMotorClient(MONGO_URI)
 
