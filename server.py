@@ -704,22 +704,36 @@ def generate_member_id_card(member: dict) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-@api_router.get("/members/{member_id}/idcard")
-async def get_member_id_card(member_id: str, user: dict = Depends(get_current_user)):
+@api_router.get("/members/{membership_number}/idcard")
+async def get_member_id_card(
+    membership_number: str,
+    user: dict = Depends(get_current_user)
+):
     """Generate and download member ID card as PDF"""
-    member = await db.members.find_one({"id": member_id}, {"_id": 0})
+
+    member = await db.members.find_one(
+        {"membership_number": membership_number},
+        {"_id": 0}
+    )
+
     if not member:
         raise HTTPException(status_code=404, detail="Member not found")
-    
+
     pdf_bytes = generate_member_id_card(member)
-    
+
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename=idcard_{member['membership_number']}.pdf"}
+        headers={
+            "Content-Disposition": f"attachment; filename=idcard_{membership_number}.pdf"
+        }
     )
-# 4️⃣ 🔴 INCLUDE ROUTER — MUST BE AT THE END
+
+# ===========================
+# REGISTER ROUTERS (MUST BE LAST)
+# ===========================
 app.include_router(api_router)
+
 # DISCIPLINARY ENDPOINTS
 @api_router.post("/disciplinary", response_model=DisciplinaryResponse)
 async def create_disciplinary_case(
