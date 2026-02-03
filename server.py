@@ -99,11 +99,19 @@ security = HTTPBearer()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from fastapi.middleware.cors import CORSMiddleware
+# CORS Configuration - Allow all origins for flexibility
+# Production domains, localhost, and preview URLs
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://portal.theeblossomfamily.org",
+    "http://portal.theeblossomfamily.org",
+    "https://bfcms-frontend-production.up.railway.app",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Allow all origins - handles preview URLs dynamically
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -797,6 +805,8 @@ async def get_member_id_card(
 # ===========================
 # REGISTER ROUTERS (MUST BE LAST)
 # ===========================
+app.include_router(api_router)
+
 # DISCIPLINARY ENDPOINTS
 @api_router.post("/disciplinary", response_model=DisciplinaryResponse)
 async def create_disciplinary_case(
@@ -1794,9 +1804,6 @@ async def send_warning_email(warning_id: str, user: dict = Depends(get_current_u
         return {"message": "Email sent successfully", "email_id": email.get("id")}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
-
-# Include router AFTER middleware
-app.include_router(api_router)
 # Logging
 logging.basicConfig(
     level=logging.INFO,
