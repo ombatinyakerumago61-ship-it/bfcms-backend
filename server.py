@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import Response
 from dotenv import load_dotenv
+from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -99,19 +100,15 @@ security = HTTPBearer()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# CORS Configuration - Allow all origins for flexibility
-# Production domains, localhost, and preview URLs
-ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://portal.theeblossomfamily.org",
-    "http://portal.theeblossomfamily.org",
-    "https://bfcms-frontend-production.up.railway.app",
-]
+from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins - handles preview URLs dynamically
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://bfcms-frontend-production.up.railway.app",  # if you deploy frontend
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -1804,6 +1801,22 @@ async def send_warning_email(warning_id: str, user: dict = Depends(get_current_u
         return {"message": "Email sent successfully", "email_id": email.get("id")}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://bfcms-frontend-production.up.railway.app",  # if you have one
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# Include router AFTER middleware
+app.include_router(api_router)
 # Logging
 logging.basicConfig(
     level=logging.INFO,
@@ -1857,4 +1870,3 @@ def root():
         "status": "running",
         "docs": "/docs"
     }
-    
