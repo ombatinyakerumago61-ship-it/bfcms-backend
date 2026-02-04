@@ -555,20 +555,29 @@ async def get_members(
     department: Optional[str] = None,
     status: Optional[str] = None,
     search: Optional[str] = None,
-    user: dict = Depends(get_current_user)
+    user: dict = Depends(
+        require_roles([
+            UserRole.SUPER_ADMIN,
+            UserRole.SECRETARY,
+            UserRole.CHAIRPERSON
+        ])
+    )
 ):
     query = {}
+
     if department:
         query["department"] = department
+
     if status:
         query["status"] = status
+
     if search:
         query["$or"] = [
             {"full_name": {"$regex": search, "$options": "i"}},
             {"membership_number": {"$regex": search, "$options": "i"}},
-            {"email": {"$regex": search, "$options": "i"}}
+            {"email": {"$regex": search, "$options": "i"}},
         ]
-    
+
     members = await db.members.find(query, {"_id": 0}).to_list(1000)
     return [MemberResponse(**m) for m in members]
 
@@ -576,7 +585,8 @@ async def get_members(
 @api_router.get("/members/{member_id}", response_model=MemberResponse)
 async def get_member(
     member_id: str,
-    user: (user: dict = Depends(get_current_user)):
+    user: dict = Depends(get_current_user)
+):
     member = await db.members.find_one({"id": member_id}, {"_id": 0})
 
     if not member:
@@ -791,6 +801,8 @@ async def get_member_id_card(
 # ===========================
 # REGISTER ROUTERS (MUST BE LAST)
 # ===========================
+app.include_router(api_router)
+
 # DISCIPLINARY ENDPOINTS
 @api_router.post("/disciplinary", response_model=DisciplinaryResponse)
 async def create_disciplinary_case(
@@ -1789,8 +1801,6 @@ async def send_warning_email(warning_id: str, user: dict = Depends(get_current_u
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
 
-# Include router AFTER middleware
-app.include_router(api_router)
 # Logging
 logging.basicConfig(
     level=logging.INFO,
