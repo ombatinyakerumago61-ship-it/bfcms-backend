@@ -17,7 +17,6 @@ from enum import Enum
 import base64
 import asyncio
 from io import BytesIO
-from fastapi import Depends, Query
 
 # PDF Generation
 from reportlab.lib.pagesizes import A4, landscape
