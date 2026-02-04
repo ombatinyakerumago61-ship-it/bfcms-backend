@@ -586,7 +586,6 @@ async def get_members(
 async def get_member(
     member_id: str,
     user: (user: dict = Depends(get_current_user)):
-    return UserResponse(**user):
     member = await db.members.find_one({"id": member_id}, {"_id": 0})
 
     if not member:
