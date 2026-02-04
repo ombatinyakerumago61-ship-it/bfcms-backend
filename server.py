@@ -17,6 +17,7 @@ from enum import Enum
 import base64
 import asyncio
 from io import BytesIO
+from fastapi import Depends, Query
 
 # PDF Generation
 from reportlab.lib.pagesizes import A4, landscape
@@ -555,13 +556,7 @@ async def get_members(
     department: Optional[str] = None,
     status: Optional[str] = None,
     search: Optional[str] = None,
-    user: dict = Depends(
-        require_roles([
-            UserRole.SUPER_ADMIN,
-            UserRole.SECRETARY,
-            UserRole.CHAIRPERSON
-        ])
-    )
+    user: dict = Depends(get_current_user)
 ):
     query = {}
 
