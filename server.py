@@ -553,27 +553,31 @@ async def create_member(
 
 @api_router.get("/members", response_model=List[MemberResponse])
 async def get_members(
-    department: Optional[str] = None,
-    status: Optional[str] = None,
-    search: Optional[str] = None,
+    department: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
     user: dict = Depends(get_current_user)
 ):
     query = {}
 
-    if department:
-        query["department"] = department
+    # Clean empty strings
+    if department and department.strip():
+        query["department"] = department.strip()
 
-    if status:
-        query["status"] = status
+    if status and status.strip():
+        query["status"] = status.strip()
 
-    if search:
+    if search and search.strip():
+        search = search.strip()
         query["$or"] = [
             {"full_name": {"$regex": search, "$options": "i"}},
             {"membership_number": {"$regex": search, "$options": "i"}},
             {"email": {"$regex": search, "$options": "i"}},
         ]
 
-    members = await db.members.find(query, {"_id": 0}).to_list(1000)
+    members_cursor = db.members.find(query, {"_id": 0})
+    members = await members_cursor.to_list(length=None)
+
     return [MemberResponse(**m) for m in members]
 
 
