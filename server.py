@@ -585,8 +585,8 @@ async def get_members(
 @api_router.get("/members/{member_id}", response_model=MemberResponse)
 async def get_member(
     member_id: str,
-    user: dict = Depends(get_current_user)
-):
+    user: (user: dict = Depends(get_current_user)):
+    return UserResponse(**user):
     member = await db.members.find_one({"id": member_id}, {"_id": 0})
 
     if not member:
