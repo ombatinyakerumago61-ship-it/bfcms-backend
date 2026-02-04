@@ -801,7 +801,6 @@ async def get_member_id_card(
 # ===========================
 # REGISTER ROUTERS (MUST BE LAST)
 # ===========================
-app.include_router(api_router)
 
 # DISCIPLINARY ENDPOINTS
 @api_router.post("/disciplinary", response_model=DisciplinaryResponse)
