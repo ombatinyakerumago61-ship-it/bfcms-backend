@@ -102,14 +102,16 @@ logger = logging.getLogger(__name__)
 
 from fastapi.middleware.cors import CORSMiddleware
 
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://portal.theeblossomfamily.org",  # match exactly your deployed frontend
+    "http://portal.theeblossomfamily.org",   # in case http is used
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://portal.theeblossomfamily.org",  # without www
-        "https://www.portal.theeblossomfamily.org", # optional if you have www version
-    ],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
