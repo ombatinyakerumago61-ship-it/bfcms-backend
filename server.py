@@ -102,21 +102,18 @@ logger = logging.getLogger(__name__)
 
 from fastapi.middleware.cors import CORSMiddleware
 
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://portal.theeblossomfamily.org",
-    "https://www.portal.theeblossomfamily.org"
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://portal.theeblossomfamily.org",  # without www
+        "https://www.portal.theeblossomfamily.org", # optional if you have www version
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
