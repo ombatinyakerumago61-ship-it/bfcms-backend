@@ -492,7 +492,7 @@ async def register(user: UserCreate):
         }
     }
 
-@api_router.post("/auth/login", response_model=dict)
+@api_router.post("api/auth/login", response_model=dict)
 async def login(credentials: UserLogin):
     user = await db.users.find_one({"email": credentials.email}, {"_id": 0})
     if not user or not verify_password(credentials.password, user["password"]):
